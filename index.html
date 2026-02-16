@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Natural Dry</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #0d0d0d;
+            --color-primary: #2d5016;
+            --color-text: #ffffff;
+            --color-text-secondary: #888;
+            --color-border: #2d5016;
+        }
+
+        body.light-mode {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --color-primary: #3d7a1f;
+            --color-text: #1a1a1a;
+            --color-text-secondary: #666;
+            --color-border: #3d7a1f;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--color-text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        /* SPLASH SCREEN */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeOut 0.5s ease-out 2s forwards;
+        }
+
+        .splash-screen.hide {
+            display: none;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                pointer-events: none;
+            }
+        }
+
+        .logo-wrapper {
+            text-align: center;
+        }
+
+        .natural-dry-logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .splash-text {
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: var(--color-primary);
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+
+        .loading-bar {
+            width: 60px;
+            height: 4px;
+            background-color: var(--bg-secondary);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loading-bar::after {
+            content: '';
+            display: block;
+            width: 30%;
+            height: 100%;
+            background-color: var(--color-primary);
+            border-radius: 2px;
+            animation: loading 2s ease-in-out forwards;
+        }
+
+        @keyframes loading {
+            0% {
+                width: 0%;
+            }
+            100% {
+                width: 100%;
+            }
+        }
+
+        .main-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .container {
+            width: 100%;
+            background-color: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            transition: background-color 0.3s ease;
+        }
+
+        /* PANTALLAS */
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* BIENVENIDA */
+        .welcome-container {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 500px;
+        }
+
+        .welcome-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 30px;
+        }
+
+        .welcome-title {
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            color: var(--color-primary);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .welcome-subtitle {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            margin-bottom: 50px;
+            letter-spacing: 1px;
+        }
+
+        .welcome-divider {
+            width: 40px;
+            height: 2px;
+            background-color: var(--color-primary);
+            margin: 0 auto 40px;
+        }
+
+        .auth-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: var(--bg-secondary);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(45, 80, 22, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--color-primary);
+            border: 1px solid var(--color-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(45, 80, 22, 0.1);
+        }
+
+        /* FORMULARIOS */
+        .form-container {
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-title {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            color: var(--color-primary);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-text);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 10px rgba(45, 80, 22, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: var(--color-text-secondary);
+        }
+
+        .form-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .toggle-auth {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+        }
+
+        .toggle-auth a {
+            color: var(--color-primary);
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toggle-auth a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background-color: rgba(197, 62, 62, 0.2);
+            border: 1px solid #c53e3e;
+            color: #ff6b6b;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* APP - BOTÓN ENGRANAJE */
+        .settings-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: var(--color-primary);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(45, 80, 22, 0.3);
+            z-index: 100;
+        }
+
+        .settings-btn.show {
+            display: flex;
+        }
+
+        .settings-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(45, 80, 22, 0.4);
+        }
+
+        .settings-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--bg-secondary);
+            animation: spin 0.6s ease;
+        }
+
+        .settings-btn:hover svg {
+            animation: spin 0.3s ease;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* MENÚ */
+        .menu {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--color-border);
+            padding: 30px 20px;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 200;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .menu.show {
+            display: block;
+        }
+
+        .menu.active {
+            transform: translateX(0);
+        }
+
+        .menu-header {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .menu-item {
+            padding: 15px 15px;
+            margin-bottom: 10px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            color: var(--color-text);
+            background: none;
+            display: block;
+            width: 100%;
+            text-align: left;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            border-color: var(--color-primary);
+            background-color: rgba(45, 80, 22, 0.1);
+            color: var(--color-primary);
+        }
+
+        .logout-btn {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 150;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* PÁGINAS */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            animation: fadeIn 0.3s ease-out;
+            display: block;
+        }
+
+        /* PÁGINA INICIO */
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: var(--color-primary);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .divider {
+            width: 40px;
+            height: 2px;
+            background-color: var(--color-primary);
+            margin: 20px auto;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .card {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--color-primary);
+            box-shadow: 0 5px 15px rgba(45, 80, 22, 0.2);
+        }
+
+        .card-label {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .card-value {
+            font-size: 56px;
+            font-weight: 300;
+            color: var(--color-primary);
+            letter-spacing: -1px;
+        }
+
+        .card-unit {
+            font-size: 18px;
+            color: var(--color-primary);
+            margin-left: 8px;
+            font-weight: 300;
+        }
+
+        .value-container {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+        }
+
+        .info-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid var(--color-border);
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .info-value {
+            font-size: 42px;
+            font-weight: 300;
+            color: var(--color-primary);
+        }
+
+        .info-unit {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            margin-left: 8px;
+            font-weight: 300;
+        }
+
+        /* PÁGINA REGISTRO */
+        .calendar-container {
+            margin: 30px 0;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-header button {
+            background-color: var(--color-primary);
+            color: var(--bg-secondary);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-header button:hover {
+            opacity: 0.8;
+        }
+
+        .calendar-header h3 {
+            font-size: 16px;
+            font-weight: 400;
+            text-align: center;
+            flex: 1;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            background-color: var(--bg-primary);
+            transition: all 0.3s ease;
+        }
+
+        .calendar-day:hover {
+            background-color: rgba(45, 80, 22, 0.1);
+        }
+
+        .calendar-day.selected {
+            background-color: var(--color-primary);
+            color: var(--bg-secondary);
+        }
+
+        .calendar-day.disabled {
+            color: var(--color-text-secondary);
+            cursor: not-allowed;
+        }
+
+        .fruit-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-text);
+            font-size: 14px;
+        }
+
+        .fruit-input::placeholder {
+            color: var(--color-text-secondary);
+        }
+
+        .add-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--color-primary);
+            color: var(--bg-secondary);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .add-btn:hover {
+            opacity: 0.9;
+        }
+
+        .fruit-list {
+            margin-top: 30px;
+        }
+
+        .fruit-item {
+            background-color: var(--bg-primary);
+            border-left: 3px solid var(--color-primary);
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .delete-btn {
+            background-color: #c53e3e;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* PÁGINA AJUSTES */
+        .settings-section {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .settings-section:last-child {
+            border-bottom: none;
+        }
+
+        .settings-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-primary);
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .toggle-switch {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+        }
+
+        .toggle-label {
+            font-size: 14px;
+            color: var(--color-text);
+        }
+
+        .switch {
+            position: relative;
+            width: 50px;
+            height: 28px;
+        }
+
+        .switch input {
+            display: none;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #888;
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--color-primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        .credits {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--color-border);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
+
+        .credits strong {
+            color: var(--color-primary);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+                border-radius: 16px;
+            }
+
+            .settings-btn {
+                width: 45px;
+                height: 45px;
+            }
+
+            .menu {
+                width: 250px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+
+            .card-value {
+                font-size: 48px;
+            }
+
+            .welcome-container {
+                min-height: auto;
+            }
+
+            .splash-screen {
+                padding: 20px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                padding: 50px 40px;
+            }
+
+            .menu {
+                width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- SPLASH SCREEN -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="logo-wrapper">
+            <svg class="natural-dry-logo" viewBox="0 0 100 100">
+                <!-- Hoja verde minimalista -->
+                <circle cx="50" cy="50" r="45" fill="none" stroke="#2d5016" stroke-width="2"/>
+                <path d="M 50 20 Q 35 35 35 50 Q 35 70 50 75 Q 65 70 65 50 Q 65 35 50 20" fill="#2d5016"/>
+                <line x1="50" y1="20" x2="50" y2="75" stroke="#0d0d0d" stroke-width="1.5"/>
+            </svg>
+            <div class="splash-text">Natural Dry</div>
+            <div class="loading-bar"></div>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE BIENVENIDA -->
+    <div class="screen active" id="welcomeScreen">
+        <div class="container">
+            <div class="welcome-container">
+                <svg class="welcome-logo" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#2d5016" stroke-width="2"/>
+                    <path d="M 50 20 Q 35 35 35 50 Q 35 70 50 75 Q 65 70 65 50 Q 65 35 50 20" fill="#2d5016"/>
+                    <line x1="50" y1="20" x2="50" y2="75" stroke="#0d0d0d" stroke-width="1.5"/>
+                </svg>
+                <h1 class="welcome-title">Natural Dry</h1>
+                <p class="welcome-subtitle">Sistema de Control</p>
+                <div class="welcome-divider"></div>
+                <div class="auth-buttons">
+                    <button class="btn btn-primary" id="signupBtn">Registrarse</button>
+                    <button class="btn btn-secondary" id="loginBtn">Iniciar Sesión</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE SIGN UP -->
+    <div class="screen" id="signupScreen">
+        <div class="container">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2 class="form-title">Registrarse</h2>
+                    <p class="subtitle">Crea tu cuenta</p>
+                </div>
+                <div class="error-message" id="signupError"></div>
+                <form id="signupForm">
+                    <div class="form-group">
+                        <label class="form-label">Nombre Completo</label>
+                        <input type="text" class="form-input" id="signupName" placeholder="Ej: Juan García" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="signupEmail" placeholder="tu@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" class="form-input" id="signupPassword" placeholder="Mínimo 6 caracteres" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Crear Cuenta</button>
+                        <button type="button" class="btn btn-secondary" id="backToWelcomeSignup">Volver</button>
+                    </div>
+                </form>
+                <div class="toggle-auth">
+                    ¿Ya tienes cuenta? <a id="toggleToLogin">Inicia sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE LOGIN -->
+    <div class="screen" id="loginScreen">
+        <div class="container">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2 class="form-title">Iniciar Sesión</h2>
+                    <p class="subtitle">Bienvenido de vuelta</p>
+                </div>
+                <div class="error-message" id="loginError"></div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="loginEmail" placeholder="tu@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" class="form-input" id="loginPassword" placeholder="Tu contraseña" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Ingresar</button>
+                        <button type="button" class="btn btn-secondary" id="backToWelcomeLogin">Volver</button>
+                    </div>
+                </form>
+                <div class="toggle-auth">
+                    ¿No tienes cuenta? <a id="toggleToSignup">Regístrate</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTÓN ENGRANAJE -->
+    <button class="settings-btn" id="settingsBtn">
+        <svg viewBox="0 0 24 24">
+            <path d="M19.14,12.94c.04,-0.3 .06,-0.61 .06,-0.94c0,-0.32 -0.02,-0.64 -0.07,-0.94l2.03,-1.58c.18,-0.14 .23,-0.41 .12,-0.64l-1.92,-3.32c-.12,-0.22 -.37,-0.29 -.59,-0.22l-2.39,.96c-.5,-0.38 -1.03,-0.7 -1.62,-0.94L14.4,2.81c-.04,-0.24 -.24,-0.41 -.48,-0.41h-3.84c-.24,0 -.43,.17 -.49,.41L9.13,5.88C8.54,6.12 8.01,6.44 7.56,6.89L5.16,5.93C4.94,5.86 4.69,5.93 4.57,6.15L2.65,9.47C2.54,9.69 2.59,9.96 2.81,10.1l2.03,1.58C4.84,12.36 4.8,12.69 4.8,13c0,.33 .02,.64 .07,.94l-2.03,1.58c-.18,.14 -.23,.41 -.12,.64l1.92,3.32c.12,.22 .37,.29 .59,.22l2.39,-0.96c.5,.38 1.03,.7 1.62,.94l.36,2.54c.05,.24 .24,.41 .48,.41h3.84c.24,0 .44,-0.17 .49,-0.41l.36,-2.54c.59,-0.24 1.13,-0.56 1.62,-0.94l2.39,.96c.22,.08 .47,0 .59,-0.22l1.92,-3.32c.12,-0.22 .07,-0.5 -.12,-0.64L19.14,12.94zM12,15.6c-1.98,0 -3.6,-1.62 -3.6,-3.6s1.62,-3.6 3.6,-3.6s3.6,1.62 3.6,3.6S13.98,15.6 12,15.6z"/>
+        </svg>
+    </button>
+
+    <!-- OVERLAY -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- MENÚ -->
+    <div class="menu" id="menu">
+        <div class="menu-header">Menú</div>
+        <button class="menu-item active" data-page="inicio">Inicio</button>
+        <button class="menu-item" data-page="registro">Registro</button>
+        <button class="menu-item" data-page="ajustes">Ajustes</button>
+        <button class="menu-item logout-btn" id="logoutBtn">Cerrar Sesión</button>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL DE APP -->
+    <div class="main-wrapper" id="appScreen" style="display: none;">
+        <div class="container">
+            <!-- PÁGINA: INICIO -->
+            <div class="page active" id="inicio">
+                <header>
+                    <div class="logo">Natural Dry</div>
+                    <div class="subtitle">Sistema de Control</div>
+                    <div class="divider"></div>
+                </header>
+
+                <div class="content">
+                    <div class="card">
+                        <span class="card-label">Temperatura Actual</span>
+                        <div class="value-container">
+                            <span class="card-value">23</span>
+                            <span class="card-unit">°C</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <span class="card-label">Tiempo Restante</span>
+                        <div class="value-container">
+                            <span class="card-value">40</span>
+                            <span class="card-unit">min</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <span class="info-label">Estado</span>
+                    <div style="font-size: 14px; color: var(--color-primary);">En Proceso</div>
+                </div>
+            </div>
+
+            <!-- PÁGINA: REGISTRO -->
+            <div class="page" id="registro">
+                <header>
+                    <div class="logo">Registro</div>
+                    <div class="subtitle">Frutas Ingresadas</div>
+                    <div class="divider"></div>
+                </header>
+
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <button id="prevMonth">← Anterior</button>
+                        <h3 id="monthYear"></h3>
+                        <button id="nextMonth">Siguiente →</button>
+                    </div>
+                    <div class="calendar-grid" id="calendar"></div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <input type="text" class="fruit-input" id="fruitInput" placeholder="Ingresa nombre de la fruta..." style="flex: 1;">
+                    <input type="number" class="fruit-input" id="quantityInput" placeholder="Cantidad" style="width: 100px;" min="1">
+                </div>
+                <button class="add-btn" id="addFruitBtn">Agregar Fruta</button>
+
+                <div class="fruit-list" id="fruitList"></div>
+            </div>
+
+            <!-- PÁGINA: AJUSTES -->
+            <div class="page" id="ajustes">
+                <header>
+                    <div class="logo">Ajustes</div>
+                    <div class="subtitle">Configuración</div>
+                    <div class="divider"></div>
+                </header>
+
+                <div style="margin-top: 40px;">
+                    <div class="settings-section">
+                        <div class="settings-title">Apariencia</div>
+                        <div class="toggle-switch">
+                            <span class="toggle-label">Modo Claro</span>
+                            <label class="switch">
+                                <input type="checkbox" id="lightModeToggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <div class="settings-title">Notificaciones</div>
+                        <div class="toggle-switch">
+                            <span class="toggle-label">Notificaciones Activas</span>
+                            <label class="switch">
+                                <input type="checkbox" id="notificationsToggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <div class="settings-title">Información</div>
+                        <div class="credits">
+                            <strong>Natural Dry</strong><br>
+                            Sistema de Control<br><br>
+                            Hecho Por:<br>
+                            <strong>García alba Christopher</strong><br>
+                            <strong>Tinajero Rodríguez Pedro Isaí</strong><br>
+                            <strong>García Gómez Aixa Ximena</strong><br>
+                            <strong>Maldonado Mosqueda Emmanuel</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ====== SPLASH SCREEN ======
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('splashScreen').classList.add('hide');
+            }, 2000);
+        });
+
+        // ====== AUTENTICACIÓN ======
+        let currentUser = null;
+
+        function loadUser() {
+            const user = localStorage.getItem('naturalDryUser');
+            return user ? JSON.parse(user) : null;
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function showError(elementId, message) {
+            const errorEl = document.getElementById(elementId);
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+            setTimeout(() => errorEl.classList.remove('show'), 3000);
+        }
+
+        // SIGNUP
+        document.getElementById('signupForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+
+            if (password.length < 6) {
+                showError('signupError', 'La contraseña debe tener mínimo 6 caracteres');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('naturalDryUsers') || '[]');
+            if (users.find(u => u.email === email)) {
+                showError('signupError', 'Este email ya está registrado');
+                return;
+            }
+
+            const newUser = { id: Date.now(), name, email, password };
+            users.push(newUser);
+            localStorage.setItem('naturalDryUsers', JSON.stringify(users));
+            localStorage.setItem('naturalDryUser', JSON.stringify(newUser));
+            
+            currentUser = newUser;
+            showApp();
+        });
+
+        // LOGIN
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            const users = JSON.parse(localStorage.getItem('naturalDryUsers') || '[]');
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (!user) {
+                showError('loginError', 'Email o contraseña incorrectos');
+                return;
+            }
+
+            localStorage.setItem('naturalDryUser', JSON.stringify(user));
+            currentUser = user;
+            showApp();
+        });
+
+        // NAVEGACIÓN DE PANTALLAS
+        document.getElementById('signupBtn').addEventListener('click', () => showScreen('signupScreen'));
+        document.getElementById('loginBtn').addEventListener('click', () => showScreen('loginScreen'));
+        document.getElementById('backToWelcomeSignup').addEventListener('click', () => showScreen('welcomeScreen'));
+        document.getElementById('backToWelcomeLogin').addEventListener('click', () => showScreen('welcomeScreen'));
+        document.getElementById('toggleToLogin').addEventListener('click', () => showScreen('loginScreen'));
+        document.getElementById('toggleToSignup').addEventListener('click', () => showScreen('signupScreen'));
+
+        // LOGOUT
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('naturalDryUser');
+            currentUser = null;
+            document.getElementById('appScreen').style.display = 'none';
+            document.getElementById('settingsBtn').classList.remove('show');
+            document.getElementById('menu').classList.remove('show', 'active');
+            document.getElementById('overlay').classList.remove('active');
+            showScreen('welcomeScreen');
+            document.getElementById('loginForm').reset();
+            document.getElementById('signupForm').reset();
+        });
+
+        // MOSTRAR APP
+        function showApp() {
+            // Ocultar todos los screens de autenticación
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            // Mostrar app
+            document.getElementById('appScreen').style.display = 'block';
+            document.getElementById('settingsBtn').classList.add('show');
+            document.getElementById('menu').classList.add('show');
+            initApp();
+        }
+
+        // VERIFICAR USUARIO AL CARGAR
+        window.addEventListener('load', () => {
+            currentUser = loadUser();
+            if (currentUser) {
+                showApp();
+            }
+        });
+
+        // ====== APP ======
+        function initApp() {
+            // VARIABLES
+            const settingsBtn = document.getElementById('settingsBtn');
+            const menu = document.getElementById('menu');
+            const overlay = document.getElementById('overlay');
+            const pages = document.querySelectorAll('.page');
+            const menuItems = document.querySelectorAll('.menu-item');
+            const lightModeToggle = document.getElementById('lightModeToggle');
+            
+            // ESTADO
+            let currentPage = 'inicio';
+            let selectedDate = null;
+            let registros = JSON.parse(localStorage.getItem(`registros_${currentUser.id}`)) || {};
+            let calendarYear = new Date().getFullYear();
+            let calendarMonth = new Date().getMonth();
+
+            // MENÚ TOGGLE
+            settingsBtn.addEventListener('click', () => {
+                menu.classList.toggle('active');
+                overlay.classList.toggle('active');
+            });
+
+            overlay.addEventListener('click', () => {
+                menu.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+
+            // NAVEGACIÓN
+            menuItems.forEach(item => {
+                if (item.id !== 'logoutBtn') {
+                    item.addEventListener('click', () => {
+                        const page = item.getAttribute('data-page');
+                        openPage(page);
+                        menu.classList.remove('active');
+                        overlay.classList.remove('active');
+                    });
+                }
+            });
+
+            function openPage(page) {
+                pages.forEach(p => p.classList.remove('active'));
+                document.getElementById(page).classList.add('active');
+                menuItems.forEach(item => {
+                    if (item.id !== 'logoutBtn') item.classList.remove('active');
+                });
+                document.querySelector(`[data-page="${page}"]`).classList.add('active');
+                currentPage = page;
+
+                if (page === 'registro') {
+                    renderCalendar();
+                    renderFruitList();
+                }
+            }
+
+            // CALENDARIO
+            function renderCalendar() {
+                const year = calendarYear;
+                const month = calendarMonth;
+                
+                const monthYear = document.getElementById('monthYear');
+                monthYear.textContent = new Date(year, month).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+
+                const prevBtn = document.getElementById('prevMonth');
+                const nextBtn = document.getElementById('nextMonth');
+                
+                if (year === 2026 && month === 0) {
+                    prevBtn.disabled = true;
+                    prevBtn.style.opacity = '0.5';
+                    prevBtn.style.cursor = 'not-allowed';
+                } else {
+                    prevBtn.disabled = false;
+                    prevBtn.style.opacity = '1';
+                    prevBtn.style.cursor = 'pointer';
+                }
+
+                const calendar = document.getElementById('calendar');
+                calendar.innerHTML = '';
+
+                const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sab'];
+                dayNames.forEach(day => {
+                    const dayEl = document.createElement('div');
+                    dayEl.className = 'calendar-day disabled';
+                    dayEl.textContent = day;
+                    calendar.appendChild(dayEl);
+                });
+
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+                for (let i = 0; i < firstDay; i++) {
+                    const emptyEl = document.createElement('div');
+                    emptyEl.className = 'calendar-day disabled';
+                    calendar.appendChild(emptyEl);
+                }
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayEl = document.createElement('div');
+                    dayEl.className = 'calendar-day';
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    const fruitCount = registros[dateStr] ? registros[dateStr].length : 0;
+                    
+                    dayEl.innerHTML = `<span style="font-size: 16px; font-weight: 500;">${day}</span>`;
+                    if (fruitCount > 0) {
+                        dayEl.innerHTML += `<span style="font-size: 10px; display: block; color: var(--color-primary); margin-top: 2px;">${fruitCount}</span>`;
+                    }
+                    
+                    dayEl.addEventListener('click', () => {
+                        selectedDate = dateStr;
+                        renderCalendar();
+                        renderFruitList();
+                    });
+                    
+                    if (selectedDate === dateStr) {
+                        dayEl.classList.add('selected');
+                    }
+                    
+                    calendar.appendChild(dayEl);
+                }
+            }
+
+            // FRUTAS
+            const fruitInput = document.getElementById('fruitInput');
+            const quantityInput = document.getElementById('quantityInput');
+            const addFruitBtn = document.getElementById('addFruitBtn');
+
+            document.getElementById('prevMonth').addEventListener('click', () => {
+                if (calendarYear === 2026 && calendarMonth === 0) return;
+                if (calendarMonth === 0) {
+                    calendarMonth = 11;
+                    calendarYear--;
+                } else {
+                    calendarMonth--;
+                }
+                renderCalendar();
+            });
+
+            document.getElementById('nextMonth').addEventListener('click', () => {
+                if (calendarMonth === 11) {
+                    calendarMonth = 0;
+                    calendarYear++;
+                } else {
+                    calendarMonth++;
+                }
+                renderCalendar();
+            });
+
+            addFruitBtn.addEventListener('click', () => {
+                if (!selectedDate) {
+                    alert('Selecciona una fecha primero');
+                    return;
+                }
+
+                const fruit = fruitInput.value.trim();
+                const quantity = quantityInput.value.trim();
+                
+                if (!fruit || !quantity) {
+                    alert('Ingresa el nombre y la cantidad de la fruta');
+                    return;
+                }
+
+                if (!registros[selectedDate]) {
+                    registros[selectedDate] = [];
+                }
+                registros[selectedDate].push({
+                    nombre: fruit,
+                    cantidad: parseInt(quantity)
+                });
+                localStorage.setItem(`registros_${currentUser.id}`, JSON.stringify(registros));
+                
+                fruitInput.value = '';
+                quantityInput.value = '';
+                renderCalendar();
+                renderFruitList();
+            });
+
+            function renderFruitList() {
+                const fruitList = document.getElementById('fruitList');
+                fruitList.innerHTML = '';
+
+                if (!selectedDate || !registros[selectedDate]) {
+                    fruitList.innerHTML = '<div style="text-align: center; color: var(--color-text-secondary); padding: 20px;">Sin frutas registradas</div>';
+                    return;
+                }
+
+                registros[selectedDate].forEach((item, index) => {
+                    const fruitElement = document.createElement('div');
+                    fruitElement.className = 'fruit-item';
+                    const nombre = typeof item === 'string' ? item : item.nombre;
+                    const cantidad = typeof item === 'string' ? '' : ` - ${item.cantidad} kg`;
+                    fruitElement.innerHTML = `
+                        <span>${nombre}${cantidad}</span>
+                        <button class="delete-btn" onclick="deleteFruit('${selectedDate}', ${index})">Eliminar</button>
+                    `;
+                    fruitList.appendChild(fruitElement);
+                });
+            }
+
+            window.deleteFruit = function(date, index) {
+                registros[date].splice(index, 1);
+                if (registros[date].length === 0) {
+                    delete registros[date];
+                }
+                localStorage.setItem(`registros_${currentUser.id}`, JSON.stringify(registros));
+                renderFruitList();
+            };
+
+            // MODO CLARO/OSCURO
+            lightModeToggle.addEventListener('change', () => {
+                document.body.classList.toggle('light-mode');
+                localStorage.setItem('lightMode', document.body.classList.contains('light-mode'));
+            });
+
+            if (localStorage.getItem('lightMode') === 'true') {
+                document.body.classList.add('light-mode');
+                lightModeToggle.checked = true;
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && menu.classList.contains('active')) {
+                    menu.classList.remove('active');
+                    overlay.classList.remove('active');
+                }
+            });
+        }
+    </script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+import { getDatabase, ref, set, onValue } 
+from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_AUTH_DOMAIN",
+  databaseURL: "TU_DATABASE_URL",
+  projectId: "TU_PROJECT_ID",
+  storageBucket: "TU_STORAGE",
+  messagingSenderId: "TU_ID",
+  appId: "TU_APP_ID"
+};
+
+// 🔥 Inicializar Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const analytics = getAnalytics(app);
+
+// 👇 AQUÍ VA TU PRUEBA
+set(ref(db, 'sensores/temperatura'), {
+  valor: 23,
+  fecha: new Date().toISOString()
+});
+
+</script>
+
+</body>
+</html>
